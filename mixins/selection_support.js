@@ -27,6 +27,57 @@
 */
 SC.SelectionSupport = {
   
+  /**
+    Called just before the controller begins updating it selection.  
+    
+    You can use this method to make modify the selection before it is made.
+    
+    @param controller {SC.SelectionSupport} The controller.
+    @param newSelection {Object or SC.Array} The new selection.
+    @returns {Array} The modified new selection.
+  */
+  controllerWillBeginSelecting: function(controller, newSelection) {
+    return newSelection;
+  },
+  
+  /**
+    Called just after a controller updates its selection.
+    
+    You can use this method to perform any changes based on the current
+    selection.
+    
+    @param controller {SC.SelectionSupport} The controller.
+    @returns {void}
+  */
+  controllerDidBeginSelecting: function(controller) {},
+  
+  /**
+    Called just before a controller tries to change its selection.
+    
+    You can use this method to control whether the controller will actually
+    change its selection.
+    
+    Note: If you return NO, and the current selection is invalid, the
+    controller will be forced to discard the selection anyway.
+    
+    @param controller {SC.SelectionSupport} The controller.
+    @returns {Boolean} YES to allow the controller to end selecting.
+  */
+  controllerShouldEndSelecting: function(controller) {
+    return YES ;
+  },
+  
+  /**
+    Called just after the controller ends a selection. You can use this 
+    method to work with the previous value of the selection and to perform any 
+    other cleanup you need to do.
+    
+    @param controller {SC.SelectionSupport} The controller.
+    @param previousSelection {Object or SC.Array} The previous selection.
+    @returns {void}
+  */
+  controllerDidEndSelecting: function(controller, previousSelection) {},
+  
   /** 
     Call this method whenever  your source content changes to ensure the 
     selection always remains up-to-date and valid.
@@ -35,7 +86,8 @@ SC.SelectionSupport = {
     var objects = Array.from(this.get('arrangedObjects')) ;
     var currentSelection = Array.from(this.get('selection')) ;
     var sel = [] ;
-
+    var delegate = this.get('delegeate') || this ;
+    
     // the new selection is the current selection that exists in 
     // arrangedObjects or an empty selection if selection is not allowed.
     var max = currentSelection.get('length') ;
@@ -45,21 +97,27 @@ SC.SelectionSupport = {
         if (objects.indexOf(obj) >= 0) sel.push(obj) ;
       }
     }
-
+    
     // if the new selection is a multiple selection, then get the first
     // object.
     var selectionLength = sel.get('length') ;
     if ((selectionLength > 1) && !this.get('allowsMultipleSelection')) {
       sel = [sel.objectAt(0)] ;
     }
-
+    
     // if the selection is empty, select the first item.
     if ((selectionLength == 0) && !this.get('allowsEmptySelection')) {
       if (objects.get('length') > 0) sel = [objects.objectAt(0)];
     }
-
+    
     // update the selection.
-    this.set('selection',sel) ;
+    var update = this.invokeDelegateMethod( delegate, 'controllerShouldEndSelecting', this );
+    if ( update || (!update && !this.get('allowsEmptySelection')) ) {
+      sel = this.invokeDelegateMethod( delegate, 'controllerWillBeginSelecting', this, sel );
+      this.set('selection', sel) ;
+      this.invokeDelegateMethod( delegate, 'controllerDidEndSelecting', this, currentSelection );
+      this.invokeDelegateMethod( delegate, 'controllerDidBeginSelecting', this );
+    }
   },
   
   /**
@@ -77,7 +135,7 @@ SC.SelectionSupport = {
   
   /**  
     @field {Array} selection 
-
+    
     This is the current selection.  You can make this selection and another
     controller's selection work in concert by binding them together. You
     generally have a master selection that relays changes TO all the others.
@@ -88,15 +146,15 @@ SC.SelectionSupport = {
       
       // always force to an array
       value = Array.from(value) ;
-    
+      
       var allowsSelection         = this.get('allowsSelection');
       var allowsEmptySelection    = this.get('allowsEmptySelection');
       var allowsMultipleSelection = this.get('allowsMultipleSelection');
-    
+      
       // are we even allowing selection at all?
       // if not, then bail out.
       if ( !allowsSelection ) return this._selection;
-    
+      
       // ok, new decide if the *type* of seleciton is allowed...
       switch ( value.get('length') )
       {
@@ -120,28 +178,28 @@ SC.SelectionSupport = {
           break;
       }
     }
-  
+    
     return this._selection;
   }.property(),
-
+  
   /**
     If true, selection is allowed.
-
-    @type bool
+    
+    @type {Boolean}
   */
   allowsSelection: true,
-
+  
   /**
     If true, multiple selection is allowed.
-
-    @type bool
+    
+    @type {Boolean}
   */
   allowsMultipleSelection: true,
-
+  
   /**
     If true, allow empty selection
 
-    @type bool
+    @type {Boolean}
   */
   allowsEmptySelection: true,
   
@@ -154,7 +212,14 @@ SC.SelectionSupport = {
   hasSelection: function() {
     var sel = this.get('selection') ;
     return sel && (sel.get('length') > 0) ;
-  }.property('selection')
-    
+  }.property('selection'),
+  
+  // copied from delegate_support.js
+  invokeDelegateMethod: function(delegate, methodName, args) {
+    args = SC.$A(arguments); args = args.slice(2, args.length) ;
+    if (!delegate || !delegate[methodName]) delegate = this ;
+    return delegate[methodName].apply(delegate, args) ;
+  }
+  
 };
 
