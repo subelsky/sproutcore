@@ -73,10 +73,22 @@ SC.SelectionSupport = {
     other cleanup you need to do.
     
     @param controller {SC.SelectionSupport} The controller.
-    @param previousSelection {Object or SC.Array} The previous selection.
+    @param previousSelection {Array} The previous selection.
     @returns {void}
   */
   controllerDidEndSelecting: function(controller, previousSelection) {},
+  
+  controllerDidEndSelectingObserver: function() {
+    var delegate = this.get('delegeate') || this ;
+    
+    // make sure we have an empty array as the initial previous selection
+    if ( !this._previousSelection ) this._previousSelection = [];
+    
+    // TODO: only send notification when selection actually changes
+    this.invokeDelegateMethod( delegate, 'controllerDidEndSelecting', this, this._previousSelection );
+    
+    this._previousSelection = this.get('selection');
+  }.observes('selection'),
   
   /** 
     Call this method whenever  your source content changes to ensure the 
