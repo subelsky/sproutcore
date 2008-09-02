@@ -81,7 +81,7 @@ SC.Binding = SC.Object.extend({
   
   // ......................................
   // INTERNAL METHODS
-
+  
   init: function() {
     arguments.callee.base.call(this) ;
     this.connect() ;
@@ -111,40 +111,39 @@ SC.Binding = SC.Object.extend({
     var tuple = SC.Object.tupleForPropertyPath(this.get('to')) ;
     if (tuple) tuple = this._walkTuple(tuple) ;
     if (tuple) {
-
+      
       // transform the value
       var transformFunc = this.transform ;
       if (transformFunc) value = transformFunc('to', key, value) ;
       this._lastToValue = value ;
-
+      
       // apply placeholder settings.
       var pholder ;
-
+      
       // handle empty placeholder.
-      if (value && (value == []) && (pholder = this.get('emptyPlaceholder'))) {
+      if (value && (SC.isArray(value)) && (value.length == 0) && (pholder = this.get('emptyPlaceholder'))) {
         value = pholder ;
-
+        
       // handle multiple value placeholder
       } else if (value && (value instanceof Array) && (pholder = this.get('multiplePlaceholder'))) {
         value = (value.length == 1) ? value[0] : pholder ;
       }
-
+      
       // now handle null placeholder.  This is used if one of these other 
       // transforms results in a null value.
       if ((value == null) && (pholder = this.get('nullPlaceholder') || this.get('emptyPlaceholder'))) {
         value = pholder ;
       }
-
+      
       tuple[0].set(tuple[1],value) ;      
       this._lastToPropertyRevision = tuple[0].propertyRevision ;
-      
     }
   },
-
+  
   _toObserver: function(target,key,value, propertyRevision) {
     // try to get the to object.
     if (this.get('oneWay')) return ; // block.
-
+    
     // to avoid echos, check against last toProperty revision.
     if (propertyRevision <= this._lastToPropertyRevision) return ;
     this._lastToPropertyRevision = propertyRevision ;
