@@ -72,6 +72,7 @@ view_helper :grid_view, :extends => :collection_view do
 end
 
 view_helper :source_list_view, :extends => :collection_view do
+  property :row_height
   view 'SC.SourceListView'
   css_class_names << 'sc-source-list-view'
 end
