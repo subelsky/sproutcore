@@ -1192,7 +1192,7 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
         // notify children if the size of the innerFrame has changed.
         var nf = newFrames[0]; var of = this._cachedFrames[0] ;
         if (force || (nf.width != of.width) || (nf.height != of.height)) {
-          this.resizeChildrenWithOldSize(this._cachedFrames.last()) ;          
+          this.resizeChildrenWithOldSize(this._cachedFrames.last(), force) ;          
         }
         
         // clear parent scrollFrame if needed
@@ -1366,10 +1366,10 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     @param oldSize {Size} The old frame size of the view.
     @returns {void}
   */
-  resizeChildrenWithOldSize: function(oldSize) {
+  resizeChildrenWithOldSize: function(oldSize, force) {
     var child = this.get('firstChild') ;
     while(child) {
-      child.resizeWithOldParentSize(oldSize) ;
+      child.resizeWithOldParentSize(oldSize, force) ;
       child = child.get('nextSibling') ;
     }
   },
@@ -1385,7 +1385,7 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     
     @param oldSize {Size} The old frame size of the parent view.
   */
-  resizeWithOldParentSize: function(oldSize) {
+  resizeWithOldParentSize: function(oldSize, force) {
     this.viewFrameWillChange() ;
     this.viewFrameDidChange(YES) ;
   },
@@ -1706,13 +1706,17 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     if (this.containerElement && ($type(this.containerElement) === T_STRING)) {
       this.containerElement = this.$sel(this.containerElement);
     }
+    
+    var droppable = this.get('isDropTarget');
+    var scrollable = this.get('isScrollable');
 
     // register as a drop target and scrollable.
-    if (this.get('isDropTarget')) SC.Drag.addDropTarget(this) ;
-    if (this.get('isScrollable')) SC.Drag.addScrollableView(this) ;
+    if (droppable) SC.Drag.addDropTarget(this) ;
+    if (scrollable) SC.Drag.addScrollableView(this) ;
     
-    // add scrollable handler
-    if (this.isScrollable) this.rootElement.onscroll = SC.View._onscroll ;
+    // add scrollable handlers
+    if (scrollable) this.rootElement.onscroll = SC.View._onscroll ;
+    if (scrollable) this.rootElement.onresize = SC.View._onresize ;
     
     // setup isVisibleInWindow ;
     this.isVisibleInWindow = (this.parentNode) ? this.parentNode.get('isVisibleInWindow') : NO;

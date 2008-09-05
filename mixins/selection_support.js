@@ -79,7 +79,7 @@ SC.SelectionSupport = {
   controllerDidEndSelecting: function(controller, previousSelection) {},
   
   controllerDidEndSelectingObserver: function() {
-    var delegate = this.get('delegeate') || this ;
+    var delegate = this.get('delegate') || this ;
     
     // make sure we have an empty array as the initial previous selection
     if ( !this._previousSelection ) this._previousSelection = [];
@@ -98,7 +98,7 @@ SC.SelectionSupport = {
     var objects = Array.from(this.get('arrangedObjects')) ;
     var currentSelection = Array.from(this.get('selection')) ;
     var sel = [] ;
-    var delegate = this.get('delegeate') || this ;
+    var delegate = this.get('delegate') || this ;
     
     // the new selection is the current selection that exists in 
     // arrangedObjects or an empty selection if selection is not allowed.

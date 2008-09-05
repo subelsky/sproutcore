@@ -56,16 +56,32 @@ SC.ScrollView = SC.ContainerView.extend(SC.Scrollable, {
   },
 
   // auto fit child view based on which scrollviews are visible
-  resizeChildrenWithOldSize: function(oldSize) {
+  resizeChildrenWithOldSize: function(oldSize, force) {
     var v = this.get('firstChild') ;
+    
+    console.log('scroll view resizeChildrenWithOldSize ' + this.rootElement.getAttribute('id'));
+    console.log('force is ' + (force ? 'on' : 'off'));
+    console.log('scrollFrame is ...');
+    console.log(this.get('scrollFrame'));
+    
     if (v) {
+      
       var f = v.get('frame');
       var orig = Object.clone(f) ;
       var innerFrame = this.get('innerFrame') ;
+      console.log('innerFrame is ...');
+      console.log(innerFrame);
+      
+      console.log('original frame of first child is ...');
+      console.log(orig);
       f.x = f.y = 0 ;
-      if (!this.get('canScrollHorizontal')) f.width = innerFrame.width ;
-      if (!this.get('canScrollVertical')) f.height = innerFrame.height ;
-      if (!SC.rectsEqual(f, orig)) v.set('frame', f) ;
+      if (!this.get('canScrollHorizontal') || f.width < innerFrame.width ) f.width = innerFrame.width ;
+      if (!this.get('canScrollVertical') || f.height < innerFrame.height ) f.height = innerFrame.height ;
+      if (!SC.rectsEqual(f, orig) || force) {
+        console.log('updating frame of first child to ...');
+        console.log(f);
+        v.set('frame', f) ;
+      }
     }
   }
   

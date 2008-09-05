@@ -50,16 +50,19 @@ SC.window = SC.PaneView.extend({
   size: function() {
     if (!this._size) {
       if (window.innerHeight) {
+        console.log('using window.innerHeight');
         this._size = { 
           width: window.innerWidth, 
           height: window.innerHeight
         };
       } else if (document.documentElement && document.documentElement.clientHeight) {
+        console.log('using document.documentElement.clientHeight');
         this._size = { 
           width: document.documentElement.clientWidth, 
           height: document.documentElement.clientHeight
         };
       } else if (document.body) {
+        console.log('using document.body');
         this._size = { 
           width: document.body.clientWidth, 
           height: document.body.clientHeight
@@ -75,14 +78,24 @@ SC.window = SC.PaneView.extend({
   _onresize: function(evt) {
     SC.runLoop.beginRunLoop();
     
+    console.log("_onresize called");
+    console.log($I(this.get('size')));
+    
     var oldSize = Object.clone(this.get('size')) ;
     this._size = null ;
     var newSize = this.get('size') ;
     if ((newSize.width != oldSize.width) || (newSize.height != oldSize.height)) {
+      console.log('resizing children');
       this.resizeChildrenWithOldSize(oldSize) ;
     }
     
     SC.runLoop.endRunLoop() ;
+  },
+  
+  forceLayout: function() {
+    console.log('forceLayout');
+    var oldSize = Object.clone(this.get('size')) ;
+    this.resizeChildrenWithOldSize(oldSize, true) ;
   },
   
   // ........................................................................

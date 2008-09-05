@@ -328,3 +328,104 @@ view_helper :slider_view do
   @inner_html = %(<span class="outer"><span #{@label_style} class="inner"></span><img src="#{self.blank_url}" class="sc-handle" /></span>)
   
 end
+
+
+view_helper :action_button do
+  # JavaScript
+  property :enabled, :key => 'isEnabled'
+
+  property :action
+  property :target
+  
+  #property(:action) { |v| "function(ev) { return #{v}(this, ev); }" }
+  property :default, :key => 'isDefault'
+  property :cancel, :key => 'isCancel'
+  property :value
+  property :theme
+  property :size
+  property :behavior, :key => 'buttonBehavior'
+  property :toggle_on_value
+  property :toggle_off_value
+
+  property :key_equivalent, :key => :keyEquivalent
+
+
+  property(:selected, :key => 'isSelected') do |x|
+    (x == :mixed) ? 'SC.MIXED_STATE' : x
+  end
+
+  view 'OI.ActionButtonView'
+
+  # HTML
+  var :title
+  var :label, @title || @inner_html || 'Submit'
+  var :tag, 'a'
+  var :theme, :regular
+  var :size, :normal
+
+  attribute(:href) { |x| (x.nil? && (@tag.downcase.to_s == 'a')) ? 'javascript:;' : x } 
+
+  # Add the theme to the CSS class.
+  css_class_names << 'sc-button-view'
+  css_class_names << 'button'
+  css_class_names << @theme unless @theme.nil? || @theme == false
+  css_class_names << @size unless @size.nil? || @size == false
+
+  var :image
+  var :sprite
+  
+  if @image
+    @image = %(<img src="#{@image}" />)
+    css_class_names << 'image'
+
+  elsif @sprite
+    img_url = self.blank_url
+    
+    if @sprite.instance_of?(Array)
+      xoff = @sprite[1] 
+      xoff = "#{xoff}px" if xoff.kind_of?(Numeric)
+
+      yoff = @sprite[2]
+      yoff = "#{yoff}px" if yoff.kind_of?(Numeric)
+    
+      # render image part
+      @image = %(<img class="sprite" style="background: url(#{@sprite[0]}) no-repeat #{xoff} #{yoff};" src="#{img_url}" />)
+    
+    else
+      @image = %(<img class="#{@sprite} sprite" src="#{img_url}" />)
+    end
+    
+  end
+  
+  # Generate some standard HTML for unless :label => false.
+  unless @label == false
+    # Button Width properties must be set on the inner label.  To deal 
+    # with this remove any width style properties from the parent element 
+    # and append them to the inner label.
+    @label_style = []
+    css_styles.flatten!
+    css_styles.reject! do | part |
+      if part =~ /width:/
+        @label_style << part
+        true
+      else
+        false
+      end
+    end
+    if @label_style.size > 0
+      @label_style = %(style="#{@label_style * ' '}" )
+    else
+      @label_style = ''
+    end
+
+    # Avoid doing the normal thing for anchor tags.
+    @inner_html = %(<span class="button-inner">#{@image}<span #{@label_style}class="label">#{@label}</span></span>)
+
+  else
+    @inner_html = [@image,@inner_html] * ''
+  end
+  
+end
+
+
+
