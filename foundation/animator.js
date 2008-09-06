@@ -149,15 +149,26 @@ Animator.prototype = {
   },
   // configure live resize
   setResizesElement: function() {
-    var subjects = this.subjects;
-    var len = subjects.length;
+    var subjectsOuter = this.subjects;
+    var lenOuter = subjectsOuter.length;
     this.resizesElement = false;
-    for (var idx = 0; idx < len; idx++) {
-      if ( subjects[idx].resizesElement() ) {
-        this.resizesElement = true;
-        break;
+    var subjectsInner = null;
+    var lenInner = 0;
+    var subject
+    for (var idxOuter = 0; idxOuter < lenOuter; idxOuter++) {
+      subjectsInner = subjectsOuter[idxOuter].subjects;
+      console.log(subjectsInner);
+      lenInner = subjectsInner.length;
+      for (var idxInner = 0; idxInner < lenInner; idxInner++) {
+        subject = subjectsInner[idxInner];
+        console.log(subject);
+        if ( subject.resizesElement && subject.resizesElement() ) {
+          this.resizesElement = true;
+          break;
+        }
       }
     }
+    console.log('resizesElement is ' + (this.resizesElement?'on':'off'));
   }
 };
 // merge the properties of two objects
@@ -196,7 +207,7 @@ Animator.apply = function(el, style, options) {
   if (style instanceof Array) {
     a = new Animator(options).addSubject(new CSSStyleSubject(el, style[0], style[1]));
   }
-  else a = Animator(options).addSubject(new CSSStyleSubject(el, style));
+  else a = new Animator(options).addSubject(new CSSStyleSubject(el, style));
   
   a.setResizesElement();
   return a
@@ -541,20 +552,22 @@ CSSStyleSubject.numericalRe = /^-?\d+(?:\.\d+)?(%|[a-zA-Z]{2})?$/;
 CSSStyleSubject.discreteRe = /^\w+$/;
 
 // required because the style object of elements isn't enumerable in Safari
-/*
-CSSStyleSubject.cssProperties = ['background-color','border','border-color','border-spacing',
-'border-style','border-top','border-right','border-bottom','border-left','border-top-color',
-'border-right-color','border-bottom-color','border-left-color','border-top-width','border-right-width',
-'border-bottom-width','border-left-width','border-width','bottom','color','font-size','font-size-adjust',
-'font-stretch','font-style','height','left','letter-spacing','line-height','margin','margin-top',
-'margin-right','margin-bottom','margin-left','marker-offset','max-height','max-width','min-height',
-'min-width','orphans','outline','outline-color','outline-style','outline-width','overflow','padding',
-'padding-top','padding-right','padding-bottom','padding-left','quotes','right','size','text-indent',
-'top','width','word-spacing','z-index','opacity','outline-offset'];*/
-
-
-CSSStyleSubject.cssProperties = ['azimuth','background','background-attachment','background-color','background-image','background-position','background-repeat','border-collapse','border-color','border-spacing','border-style','border-top','border-top-color','border-right-color','border-bottom-color','border-left-color','border-top-style','border-right-style','border-bottom-style','border-left-style','border-top-width','border-right-width','border-bottom-width','border-left-width','border-width','bottom','clear','clip','color','content','cursor','direction','display','elevation','empty-cells','css-float','font','font-family','font-size','font-size-adjust','font-stretch','font-style','font-variant','font-weight','height','left','letter-spacing','line-height','list-style','list-style-image','list-style-position','list-style-type','margin','margin-top','margin-right','margin-bottom','margin-left','max-height','max-width','min-height','min-width','orphans','outline','outline-color','outline-style','outline-width','overflow','padding','padding-top','padding-right','padding-bottom','padding-left','pause','position','right','size','table-layout','text-align','text-decoration','text-indent','text-shadow','text-transform','top','vertical-align','visibility','white-space','width','word-spacing','z-index','opacity','outline-offset','overflow-x','overflow-y'];
-
+CSSStyleSubject.cssProperties = [
+  'azimuth','background','background-attachment','background-color',
+  'background-image','background-position','background-repeat','border-collapse','border-color',
+  'border-spacing','border-style','border-top','border-top-color','border-right-color',
+  'border-bottom-color','border-left-color','border-top-style','border-right-style','border-bottom-style',
+  'border-left-style','border-top-width','border-right-width','border-bottom-width','border-left-width',
+  'border-width','bottom','clear','clip','color','content','cursor','direction','display','elevation',
+  'empty-cells','css-float','font','font-family','font-size','font-size-adjust','font-stretch','font-style',
+  'font-variant','font-weight','height','left','letter-spacing','line-height','list-style',
+  'list-style-image','list-style-position','list-style-type','margin','margin-top','margin-right',
+  'margin-bottom','margin-left','max-height','max-width','min-height','min-width','orphans','outline',
+  'outline-color','outline-style','outline-width','overflow','padding','padding-top','padding-right',
+  'padding-bottom','padding-left','pause','position','right','size','table-layout','text-align',
+  'text-decoration','text-indent','text-shadow','text-transform','top','vertical-align','visibility',
+  'white-space','width','word-spacing','z-index','opacity','outline-offset','overflow-x','overflow-y'
+];
 
 // chains several Animator objects together
 function AnimatorChain(animators, options) {

@@ -1137,6 +1137,45 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
   }.property('frame'),
   
   /**
+    Write me.
+    
+    @returns {void}
+  */
+  viewWillStartLiveResize: function() {
+    // if (this._frameChangeLevel++ <= 0) {
+    //   this._frameChangeLevel = 1 ;
+    //   
+    //   // save frame information if view has manual layout.
+    //   if (this.get('needsFrameChanges')) {
+    //     this._cachedFrames = this.getEach('innerFrame', 'clippingFrame', 'frame') ;
+    //   } else this._cachedFrames = null ;
+    //   this.beginPropertyChanges(); // suspend change notifications
+    // }
+    var children = this.childNodes;
+    var len = children.length;
+    for ( var idx = 0; idx < len; idx++ ) {
+      children[idx].viewWillStartLiveResize();
+    }
+  },
+
+  /**
+    Write me.
+    
+    @returns {void}
+  */
+  viewDidEndLiveResize: function() {
+    // if (this._frameChangeLevel++ <= 0) {
+    //   this._frameChangeLevel = 1 ;
+    // 
+    //   // save frame information if view has manual layout.
+    //   if (this.get('needsFrameChanges')) {
+    //     this._cachedFrames = this.getEach('innerFrame', 'clippingFrame', 'frame') ;
+    //   } else this._cachedFrames = null ;
+    //   this.beginPropertyChanges(); // suspend change notifications
+    // }
+  },
+
+  /**
     Call this method before you make a change that will impact the frame of 
     the view such as changing the border thickness or adding/removing a CSS 
     style.
