@@ -50,19 +50,16 @@ SC.window = SC.PaneView.extend({
   size: function() {
     if (!this._size) {
       if (window.innerHeight) {
-        console.log('using window.innerHeight');
         this._size = { 
           width: window.innerWidth, 
           height: window.innerHeight
         };
       } else if (document.documentElement && document.documentElement.clientHeight) {
-        console.log('using document.documentElement.clientHeight');
         this._size = { 
           width: document.documentElement.clientWidth, 
           height: document.documentElement.clientHeight
         };
       } else if (document.body) {
-        console.log('using document.body');
         this._size = { 
           width: document.body.clientWidth, 
           height: document.body.clientHeight
@@ -78,24 +75,48 @@ SC.window = SC.PaneView.extend({
   _onresize: function(evt) {
     SC.runLoop.beginRunLoop();
     
-    console.log("_onresize called");
-    console.log($I(this.get('size')));
-    
-    var oldSize = Object.clone(this.get('size')) ;
-    this._size = null ;
-    var newSize = this.get('size') ;
-    if ((newSize.width != oldSize.width) || (newSize.height != oldSize.height)) {
-      console.log('resizing children');
-      this.resizeChildrenWithOldSize(oldSize) ;
+    if (SC.isSafari()) {
+      if ( !this.inLiveResize ) {
+        this.inLiveResize = true;
+        this.viewWillStartLiveResize();
+        this._liveResizeTimer = SC.Timer.schedule({ target: this, action: '_liveResizeCompleted', interval: 500, startTime: Date.now() });
+      }
+      else this._liveResizeTimer.set('startTime', Date.now()); // delay our timer
+      
+      // update our children
+      this._size = null ; // clear our size cache
+      var oldSize = Object.clone(this.get('size')) ;
+      var newSize = this.get('size') ;
+      if ((newSize.width != oldSize.width) || (newSize.height != oldSize.height)) {
+        this.resizeChildrenWithOldSize(oldSize) ;
+      }
+    }
+    else {
+      this._size = null ; // clear our size cache
+      var oldSize = Object.clone(this.get('size')) ;
+      this.viewWillStartLiveResize();
+      this.viewDidEndLiveResize();
+      this.resizeChildrenWithOldSize(oldSize, true) ; // force a resize
     }
     
     SC.runLoop.endRunLoop() ;
   },
   
-  forceLayout: function() {
-    console.log('forceLayout');
+  _liveResizeCompleted: function() {
+    SC.runLoop.beginRunLoop();
+    
+    this.inLiveResize = false;
+    this._liveResizeTimer = null;
+    this.viewDidEndLiveResize();
+    
+    this._size = null ; // clear our size cache
     var oldSize = Object.clone(this.get('size')) ;
-    this.resizeChildrenWithOldSize(oldSize, true) ;
+    var newSize = this.get('size') ;
+    if ((newSize.width != oldSize.width) || (newSize.height != oldSize.height)) {
+      this.resizeChildrenWithOldSize(oldSize) ;
+    }
+    
+    SC.runLoop.endRunLoop() ;
   },
   
   // ........................................................................

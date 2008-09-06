@@ -1142,19 +1142,10 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     @returns {void}
   */
   viewWillStartLiveResize: function() {
-    // if (this._frameChangeLevel++ <= 0) {
-    //   this._frameChangeLevel = 1 ;
-    //   
-    //   // save frame information if view has manual layout.
-    //   if (this.get('needsFrameChanges')) {
-    //     this._cachedFrames = this.getEach('innerFrame', 'clippingFrame', 'frame') ;
-    //   } else this._cachedFrames = null ;
-    //   this.beginPropertyChanges(); // suspend change notifications
-    // }
-    var children = this.childNodes;
-    var len = children.length;
+    var ary = this.childNodes;
+    var len = ary.length;
     for ( var idx = 0; idx < len; idx++ ) {
-      children[idx].viewWillStartLiveResize();
+      ary[idx].viewWillStartLiveResize();
     }
   },
 
@@ -1164,15 +1155,11 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     @returns {void}
   */
   viewDidEndLiveResize: function() {
-    // if (this._frameChangeLevel++ <= 0) {
-    //   this._frameChangeLevel = 1 ;
-    // 
-    //   // save frame information if view has manual layout.
-    //   if (this.get('needsFrameChanges')) {
-    //     this._cachedFrames = this.getEach('innerFrame', 'clippingFrame', 'frame') ;
-    //   } else this._cachedFrames = null ;
-    //   this.beginPropertyChanges(); // suspend change notifications
-    // }
+    var ary = this.childNodes;
+    var len = ary.length;
+    for ( var idx = 0; idx < len; idx++ ) {
+      ary[idx].viewDidEndLiveResize();
+    }
   },
 
   /**
@@ -1205,7 +1192,7 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     frame of the view such as changing the border thickness or adding/removing 
     a CSS style.
     
-    It is safe to next multiple calls to this method.   This method is called 
+    It is safe to nest multiple calls to this method.   This method is called 
     automatically anytime you set the frame.
     
     @returns {void}
@@ -1426,7 +1413,7 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
   */
   resizeWithOldParentSize: function(oldSize, force) {
     this.viewFrameWillChange() ;
-    this.viewFrameDidChange(YES) ;
+    this.viewFrameDidChange(force) ;
   },
   
   /** @private

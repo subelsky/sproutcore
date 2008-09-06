@@ -30,12 +30,15 @@
 
 */
 
+require('views/view');
+
 // Applies a sequence of numbers between 0 and 1 to a number of subjects
 // construct - see setOptions for parameters
-function Animator(options) {
+function Animator(options, element) {
+  var that = this;
   this.setOptions(options);
-  var _this = this;
-  this.timerDelegate = function(){_this.onTimerEvent();};
+  this.view = SC.View.findViewForElement(element).parentNode;
+  this.timerDelegate = function(){ that.onTimerEvent(); };
   this.subjects = [];
   this.target = 0;
   this.state = 0;
@@ -61,14 +64,16 @@ Animator.prototype = {
   },
   // animate from the current state to provided value
   seekFromTo: function(from, to) {
-    if ( this.resizesElement ) this.options.onResizeStart.call(this);
+    if ( this.resizesElement ) {
+      if ( this.view ) this._oldSize = this.view.get('size');
+      if (this.view) this.view.viewWillStartLiveResize();
+      this.options.onResizeStart.call(this);
+    }
     this.options.onStart.call(this);
     this.target = Math.max(0, Math.min(1, to));
     this.state = Math.max(0, Math.min(1, from));
     this.lastTime = new Date().getTime();
     if (!this.intervalId) {
-      // this.intervalId = this.setInterval(this.timerDelegate, this.options.interval);
-     
        this.intervalId = SC.Timer.schedule({
           target: this, 
           action: this.timerDelegate, 
@@ -127,11 +132,14 @@ Animator.prototype = {
     } finally {
       this.options.onStep.call(this);
       if (this.target == this.state) {
-        // window.clearInterval(this.intervalId);
         this.intervalId.invalidate();
         this.intervalId = null;
-        if ( this.resizesElement ) this.options.onResizeEnd.call(this);
+        if ( this.resizesElement ) {
+          this.options.onResizeEnd.call(this);
+          if (this.view) this.view.viewDidEndLiveResize();
+        }
         this.options.onComplete.call(this);
+        if (this.view) this.view.resizeChildrenWithOldSize(this._oldSize, false);
       }
     }
   },
@@ -157,18 +165,15 @@ Animator.prototype = {
     var subject
     for (var idxOuter = 0; idxOuter < lenOuter; idxOuter++) {
       subjectsInner = subjectsOuter[idxOuter].subjects;
-      console.log(subjectsInner);
       lenInner = subjectsInner.length;
       for (var idxInner = 0; idxInner < lenInner; idxInner++) {
         subject = subjectsInner[idxInner];
-        console.log(subject);
         if ( subject.resizesElement && subject.resizesElement() ) {
           this.resizesElement = true;
           break;
         }
       }
     }
-    console.log('resizesElement is ' + (this.resizesElement?'on':'off'));
   }
 };
 // merge the properties of two objects
@@ -205,9 +210,9 @@ Animator.camelize = function(string) {
 Animator.apply = function(el, style, options) {
   var a = null;
   if (style instanceof Array) {
-    a = new Animator(options).addSubject(new CSSStyleSubject(el, style[0], style[1]));
+    a = new Animator(options, el).addSubject(new CSSStyleSubject(el, style[0], style[1]));
   }
-  else a = new Animator(options).addSubject(new CSSStyleSubject(el, style));
+  else a = new Animator(options, el).addSubject(new CSSStyleSubject(el, style));
   
   a.setResizesElement();
   return a
