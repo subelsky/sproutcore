@@ -1742,7 +1742,6 @@ SC.View = SC.Responder.extend(SC.PathModule,  SC.DelegateSupport,
     
     // add scrollable handlers
     if (scrollable) this.rootElement.onscroll = SC.View._onscroll ;
-    if (scrollable) this.rootElement.onresize = SC.View._onresize ;
     
     // setup isVisibleInWindow ;
     this.isVisibleInWindow = (this.parentNode) ? this.parentNode.get('isVisibleInWindow') : NO;

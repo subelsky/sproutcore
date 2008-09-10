@@ -529,10 +529,9 @@ SC.Enumerable = {
     if (len <= 0) return null; // nothing to invoke....
 
     // collect the arguments
-    var args = null ;
+    var args = [] ;
     var alen = arguments.length ;
     if (alen > 2) {
-      args = [] ;
       for(var idx=2;idx<alen;idx++) args.push(arguments[idx]) ;
     }
     
@@ -839,10 +838,9 @@ SC.mixin(Array.prototype, SC.Reducers) ;
       if (len <= 0) return [] ; // nothing to invoke....
 
       // collect the arguments
-      var args = null ;
+      var args = [] ;
       var alen = arguments.length ;
       if (alen > 1) {
-        args = [] ;
         for(var idx=1;idx<alen;idx++) args.push(arguments[idx]) ;
       }
 
