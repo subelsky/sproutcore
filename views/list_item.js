@@ -511,6 +511,67 @@ SC.ListItemView = SC.View.extend(SC.Control, SC.InlineEditorDelegate,
      // b/c its opacity is 0.
      this._lastRenderedHtml = null;
      this.render() ;
-   }   
+   },
   
+   /** @private
+     List items are always is a collection view, and fill the collection view's frame horizonally.
+   */
+   frame: function(key, value) {
+
+     // if value was passed, set the values in the style
+     // now update the frame if needed.  Only actually change the style for
+     // those parts of the frame that were passed in.
+     if (value !== undefined) {
+
+       this.viewFrameWillChange() ;
+
+       var f= value ;
+       var style = { right: '0px', left: '0px' } ;
+
+       // reposition Y
+       if (value.y !== undefined) {
+         style.top = Math.floor(f.y) + 'px' ;
+         style.bottom = 'auto';
+       }
+
+       this.setStyle(style) ;
+
+       // notify for a resize only.
+       this.viewFrameDidChange() ;
+     }
+
+     // build frame.  We can use a cached version but only 
+     // if layoutMode == SC.MANUAL_MODE
+     var f;
+     if (this._frame == null) {
+       var el = this.rootElement ;
+       f = this._collectFrame(function() {
+         return { 
+           x: el.offsetLeft, 
+           y: el.offsetTop, 
+           width: el.offsetWidth, 
+           height: el.offsetHeight 
+         };
+       }) ;
+
+       // bizarely for FireFox if your offsetParent has a border, then it can 
+       // impact the offset
+       if (SC.Platform.Firefox) {
+         var parent = el.offsetParent ;
+         var overflow = (parent) ? Element.getStyle(parent, 'overflow') : 'visible' ;
+         if (overflow && overflow !== 'visible') {
+           var left = parseInt(Element.getStyle(parent, 'borderLeftWidth'),0) || 0 ;
+           var top = parseInt(Element.getStyle(parent, 'borderTopWidth'),0) || 0 ;
+           f.x += left; f.y += top ;
+         }
+       }
+
+       // cache this frame if using manual layout mode
+       this._frame = SC.cloneRect(f);
+     } else f = SC.cloneRect(this._frame) ;
+
+     // finally return the frame. 
+     return f ;
+   }.property()
+
 }) ;

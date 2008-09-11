@@ -2752,8 +2752,56 @@ SC.CollectionView = SC.View.extend(SC.CollectionViewDelegate,
   itemExistsInCollection: function( view ) { return this.hasItemView(view); },
   
   /** @private */
-  viewForContentRecord: function(rec) { return this.itemViewForContent(rec); }
+  viewForContentRecord: function(rec) { return this.itemViewForContent(rec); },
   
+  /** @private
+    Collection views are always is a scroll view, and fill the scroll view's frame.
+  */
+  frame: function(key, value) {
+
+    if (value !== undefined) {
+      
+      this.viewFrameWillChange() ;
+      
+      // now apply style change and clear the cached frame
+      this.setStyle( { top: '0px',  right: '0px', bottom: '0px', left: '0px' }) ;
+      
+      this.viewFrameDidChange() ;
+    }
+    
+    // build frame.  We can use a cached version but only 
+    // if layoutMode == SC.MANUAL_MODE
+    var f;
+    if (this._frame == null) {
+      var el = this.rootElement ;
+      f = this._collectFrame(function() {
+        return { 
+          x: el.offsetLeft, 
+          y: el.offsetTop, 
+          width: el.offsetWidth, 
+          height: el.offsetHeight 
+        };
+      }) ;
+      
+      // bizarely for FireFox if your offsetParent has a border, then it can 
+      // impact the offset
+      if (SC.Platform.Firefox) {
+        var parent = el.offsetParent ;
+        var overflow = (parent) ? Element.getStyle(parent, 'overflow') : 'visible' ;
+        if (overflow && overflow !== 'visible') {
+          var left = parseInt(Element.getStyle(parent, 'borderLeftWidth'),0) || 0 ;
+          var top = parseInt(Element.getStyle(parent, 'borderTopWidth'),0) || 0 ;
+          f.x += left; f.y += top ;
+        }
+      }
+      
+      // cache this frame if using manual layout mode
+      this._frame = SC.cloneRect(f);
+    } else f = SC.cloneRect(this._frame) ;
+
+    // finally return the frame. 
+    return f ;
+  }.property()
   
 }) ;
 
