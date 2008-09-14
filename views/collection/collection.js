@@ -2755,7 +2755,7 @@ SC.CollectionView = SC.View.extend(SC.CollectionViewDelegate,
   viewForContentRecord: function(rec) { return this.itemViewForContent(rec); },
   
   /** @private
-    Collection views are always is a scroll view, and fill the scroll view's frame.
+    Collection views are always is a scroll view, and fill the scroll view's frame horizontally.
   */
   frame: function(key, value) {
 
@@ -2764,7 +2764,7 @@ SC.CollectionView = SC.View.extend(SC.CollectionViewDelegate,
       this.viewFrameWillChange() ;
       
       // now apply style change and clear the cached frame
-      this.setStyle( { top: '0px',  right: '0px', bottom: '0px', left: '0px' }) ;
+      this.setStyle( { top: '0px',  right: '0px', height: Math.floor(value.height) + 'px', left: '0px' }) ;
       
       this.viewFrameDidChange() ;
     }
