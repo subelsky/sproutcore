@@ -52,30 +52,30 @@ SC.SegmentedView = SC.View.extend(
 
   /** @private */
   init: function() {
-    arguments.callee.base.call(this) ;
+    sc_super();
     
-    // find all segment outlets.  If they don't have any action already, set 
-    // them up.
-    if (!this.segments) this.segments = this.outlets.slice() ;
-    var view = this ;
-    this.segments.each(function(key) {
-      var seg = view[key] ;
-      var selectKey = key.slice(0,-6) ;
-      if (seg && (seg.action == SC.ButtonView.prototype.action)) seg.action = function() {
-        if (this.owner.get('allowsEmptySelection')) {
-          newKey = (this.owner.get('value') == selectKey) ? null : selectKey;
-        } else newKey = selectKey;
-        this.owner.set('value',newKey) ;
-      } ;
-    }) ;
+    // find all segment outlets.  If they don't have any action already, set them up.
+    if (!this.segments) this.segments = this.outlets.slice();
+    var view = this;
+    this.segments.each( function(key) {
+      var seg = view[key];
+      var selectKey = key.slice(0,-6);
+      if (seg && (seg.action == SC.ButtonView.prototype.action)) {
+        seg.action = function() {
+          if (view.get('value') != selectKey) view.set('value', selectKey);
+          else if (view.get('allowsEmptySelection')) view.set('value', null);
+        };
+      }
+    });
     
-    this._enabledObserver() ;
-    this._valueObserver() ;
+    this._enabledObserver();
+    this._valueObserver();
   },
   
   // OBSERVERS
   _valueObserver: function() {
     var value = this.get('value') ;
+    console.log(value);
     if (value != this._lastSelected) {
       this._lastSelected = value ;
       var view = this ;

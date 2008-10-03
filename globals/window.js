@@ -383,16 +383,16 @@ SC.window = SC.PaneView.extend({
   },
   
   _onfocus: function() {
-    if (!this._hasFocus) {
-      this._hasFocus = YES ;
+    if (!this.hasFocus) {
+      this.hasFocus = YES ;
       this.addClassName('focus') ;
       this.removeClassName('blur') ;
     }
   },
   
   _onblur: function() {
-    if (this._hasFocus) {
-      this._hasFocus = NO ;
+    if (this.hasFocus) {
+      this.hasFocus = NO ;
       this.removeClassName('focus') ;
       this.addClassName('blur');
     }
@@ -418,10 +418,10 @@ SC.window = SC.PaneView.extend({
     return false;
   },
   
-  _hasFocus: NO,
+  hasFocus: YES,
   
-  _EVTS: ['mousedown', 'mouseup', 'click', 'dblclick', 'keydown', 'keyup', 'keypress', 'mouseover', 'mouseout', 'mousemove', 'resize', 'unload', 'focus', 'blur','drag','selectstart'],
-
+  _EVTS: ['mousedown', 'mouseup', 'click', 'dblclick', 'keydown', 'keyup', 'keypress', 'mouseover', 'mouseout', 'mousemove', 'resize', 'unload', 'drag','selectstart'],
+  
   _listenerCache: [],
   
   setup: function()
@@ -458,6 +458,10 @@ SC.window = SC.PaneView.extend({
     this.get('size') ;
     // fetch the size from the window and save it.
     this.set('isVisibleInWindow', true) ;
+    
+    window.onblur = this._onblur.bind(this);
+    window.onfocus = this._onfocus.bind(this);
+    
     this._onfocus() ;
   }
   }).viewFor($tag('body')) ;
