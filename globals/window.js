@@ -384,6 +384,7 @@ SC.window = SC.PaneView.extend({
   
   _onfocus: function() {
     if (!this.hasFocus) {
+      // console.log('window has focus');
       this.hasFocus = YES ;
       this.addClassName('focus') ;
       this.removeClassName('blur') ;
@@ -392,6 +393,7 @@ SC.window = SC.PaneView.extend({
   
   _onblur: function() {
     if (this.hasFocus) {
+      // console.log('window has blur');
       this.hasFocus = NO ;
       this.removeClassName('focus') ;
       this.addClassName('blur');
@@ -459,9 +461,11 @@ SC.window = SC.PaneView.extend({
     // fetch the size from the window and save it.
     this.set('isVisibleInWindow', true) ;
     
+    // console.log('setting up focus/blur handlers');
     window.onblur = this._onblur.bind(this);
     window.onfocus = this._onfocus.bind(this);
     
+    window.focus();
     this._onfocus() ;
   }
   }).viewFor($tag('body')) ;
