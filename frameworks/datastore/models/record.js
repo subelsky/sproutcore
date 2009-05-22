@@ -261,7 +261,7 @@ SC.Record = SC.Object.extend(
   normalize: function(includeNull) {
     
     var primaryKey = this.primaryKey, dataHash = {}, recordId = this.get('id');
-    var store = this.get('store'), storeKey = this.get('storeKey');
+    var store = this.get('store'), storeKey = this.get('storeKey'), attrValue, isRecord;
     
     dataHash[primaryKey] = recordId;
     
@@ -269,12 +269,28 @@ SC.Record = SC.Object.extend(
       // make sure property is a record attribute. if record attribute is a class (SC.Record)
       // do not add to hash unless includeNull argument is true.
       if(this[key] && this[key]['typeClass']) {
-        
-        if (SC.typeOf(this[key].typeClass())!=='class' || this[key].defaultValue!==null) {
-          var attrValue = this.get(key);
+        isRecord = SC.typeOf(this[key].typeClass())==='class';
+
+        if (!isRecord) {
+          attrValue = this.get(key);
           if(attrValue || includeNull) dataHash[key] = attrValue;
         }
-        else if(includeNull) dataHash[key] = null;
+        else if(isRecord) {
+
+          if(SC.typeOf(this.get(key))===SC.T_OBJECT) {
+            // if relationships are present
+            var ids = this.get(key).getEach('id');
+            dataHash[key] = ids.get('length')>1 ? ids : ids[0];
+          }
+          else {
+            // otherwise write default
+            dataHash[key] = (this.get(key).get) ? this.get(key).get('id') : this.get(key);
+          }
+          
+        }
+        else if(includeNull) {
+          dataHash[key] = null;
+        }
         
       }
     }

@@ -763,7 +763,10 @@ SC.View = SC.Object.extend(SC.Responder, SC.DelegateSupport,
     
     var childViews = this.get('childViews') ;
     len = childViews.length ;
-    for (idx=0; idx<len; ++idx) childViews[idx]._notifyDidCreateLayer() ;
+    for (idx=0; idx<len; ++idx) {
+      if (!childViews[idx]) continue;
+      childViews[idx]._notifyDidCreateLayer() ;
+    }
   },
   
   /**
@@ -892,6 +895,7 @@ SC.View = SC.Object.extend(SC.Responder, SC.DelegateSupport,
     var cv = this.get('childViews'), len = cv.length, idx, view ;
     for (idx=0; idx<len; ++idx) {
       view = cv[idx] ;
+      if (!view) continue;
       context = context.begin(view.get('tagName')) ;
       view.prepareContext(context, firstTime) ;
       context = context.end() ;
@@ -1169,7 +1173,10 @@ SC.View = SC.Object.extend(SC.Responder, SC.DelegateSupport,
   awake: function() {
     sc_super();
     var childViews = this.get('childViews'), len = childViews.length, idx ;
-    for (idx=0; idx<len; ++idx) childViews[idx].awake() ;
+    for (idx=0; idx<len; ++idx) {
+      if (!childViews[idx]) continue ;
+      childViews[idx].awake() ;
+    } 
   },
     
   /** 
@@ -1254,6 +1261,12 @@ SC.View = SC.Object.extend(SC.Responder, SC.DelegateSupport,
         if (typeof key === SC.T_STRING) {
           view = this[key];
         } else key = null ;
+        
+        if (!view) {
+          console.error ("No view with name "+key+" has been found in "+this.toString());
+          // skip this one.
+          continue;
+        }
         
         if (view.isClass) {
           view = this.createChildView(view) ; // instantiate if needed

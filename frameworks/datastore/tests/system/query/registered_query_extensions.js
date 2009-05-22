@@ -22,7 +22,7 @@ module("SC.Query registered query extensions", {
       { guid: 2, firstName: "Jane", lastName: "Doe", year: 1975 },
       { guid: 3, firstName: "Emily", lastName: "Parker", year: 1975, active: null },
       { guid: 4, firstName: "Johnny", lastName: "Cash", active: false },
-      { guid: 5, firstName: "Bert", lastName: "Berthold", active: true }
+      { guid: 5, firstName: "Bert", lastName: "Jules", active: true }
     ]);
     
     rec1 = MyApp.store.find(MyApp.Foo,1);
@@ -42,21 +42,26 @@ module("SC.Query registered query extensions", {
 // 
 
 test("SC.Query.queryExtensions", function(){
-  SC.Query.registerQueryExtension('startsWithJ', {
-    tokenType:    'COMPARISON',
-    reservedWord: 'STARTS_WITH_J',
-    leftType:    'PRIMITIVE',
-    evalType:     'BOOLEAN',
-    evaluate:     function (r,w) {
-                    var word = this.leftSide.evaluate(r,w);
-                    return ( word.substr(0,1) == 'J' );
-    }
+  SC.Query.registerQueryExtension('STARTS_WITH_J', {
+    reservedWord: true,
+    leftType: 'PRIMITIVE',
+    evalType: 'BOOLEAN',
+    evaluate: function (r,w) {
+                var word = this.leftSide.evaluate(r,w);
+                return ( word.substr(0,1) == 'J' );
+              }
   });
 
-  ok(q.queryLanguage['startsWithJ'], 'extension startsWithJ should be set');
+  ok(q.queryLanguage['STARTS_WITH_J'], 'extension STARTS_WITH_J should be set');
+  
   q.conditions = "firstName STARTS_WITH_J";
   q.parseQuery();
   ok(q.contains(rec2), "Jane should match");
   ok(!q.contains(rec3), "Emily should not match");
+  
+  q.conditions = "firstName STARTS_WITH_J OR lastName STARTS_WITH_J";
+  q.parseQuery();
+  ok(q.contains(rec2), "Jane Doe should match");
+  ok(q.contains(rec5), "Bert Jules should match");
 
 });
