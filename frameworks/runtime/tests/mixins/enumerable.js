@@ -444,7 +444,7 @@ test("get @maxObject(balance) should return the record with the max balance", fu
   var src, ary2 = enumerables ;
   for (var idx2=0, len2=ary2.length; idx2<len2; idx2++) {
     src = ary2[idx2] ;
-    equals(src.objectAt(0), src.get('@maxObject(balance)')) ;
+    equals(src.objectAt(3), src.get('@maxObject(balance)')) ;
   }
 });
 
@@ -535,6 +535,12 @@ test("should trigger observer of reduced prop when array changes - even if you n
     // was triggered when we changed the array contents.
     equals(5, observedValue, "observedValue") ;
   }
+});
+
+test("should find the first element matching the criteria", function() {
+  var people = enumerables[1] ;
+  var jenna = people.find(function(person) { return person.gender == 'female'; });
+  equals(jenna.first, 'Jenna');
 });
 
 var source ; // global variables
