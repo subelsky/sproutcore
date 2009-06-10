@@ -1,3 +1,66 @@
+== sproutcore 0.9.19
+
+- SC.Server refresh fix [Evin Grano]
+
+== sproutcore 0.9.18
+
+- picker.js bug (Ticket #82) [Alexei Svitkine]
+
+- selection_support.js problem with SelectFieldView (Tickets #103, #104) [Bill Klaila]
+
+- Fixed radio enabled display state (Ticket #127) [Gert Hulstein]
+
+- CollectionView doesn't resize groups after a frame change (Ticket #12) [Christopher Swasey]
+
+- SC.Record.Date should handle GMT formatted strings (Ticket #101) [Joshua Dickens, Erich Ocean]
+
+- Missing SC.Collection.removeRecords method (Ticket #102) [mm]
+
+- SC.Record.create() inconsistency (Ticket #99) [Michael Allman]
+
+- toMany relationship is null (Ticket #166) [Reto Wolf]
+
+- SC.CollectionView itemViewForEvent somtimes throws exception on IE8 (Ticket #169)
+  [Darryl Fuller]
+
+- SC.Collection doesn't update itself properly (Ticket #152) [Christopher Swasey]
+
+- SC.Record notifies SC.Store improperly of changes (Ticket #155) [Christopher Swasey]
+
+- Basic tests for collections (initial) (Ticket #156) [Christopher Swasey]
+
+- problem with record.js; parent-child relationship; and tomcat (Ticket #154) [Bill Klaila]
+
+- SC.CollectionController.hasSelection() does not return anything when there is no content
+  (Ticket #178) [Maurits Lamers, Erich Ocean]
+
+- CollectionView doesn't properly redraw contents if it isn't visible at the time of a
+  content change (Ticket #123) [Christopher Swasey]
+
+- Split view can collapse when thickness becomes less than a given value
+  (Ticket #137) [Lawrence Pit]
+
+- IE6 Fix (Ticket #162) [sujoykroy]
+
+- String.fmt ordered arguments are broken (Ticket #165) [Boris Smus, Erich Ocean]
+
+- Reimplementation of Array.invoke breaks Scriptaculous (Ticket #163) [Boris Smus]
+
+- record.js/readAttributes() Bug (Ticket #139) [Evin Grano]
+
+- Records with multiple toMany relationships mixup data (Ticket #161)
+  [Reto Wolf, Erich Ocean]
+
+- Segmented buttons are 1 pixel too tall towards the bottom (Ticket #138) [Lawrence Pit]
+
+- Split view doesn't honor canCollapse property (Ticket #128) [Lawrence Pit]
+
+- Split view doesn't honor min_thickness property (Ticket #129) [Lawrence Pit]
+
+== sproutcore 0.9.17
+
+- Fix require()'s for server/rest_server.js and server/rails_server.js
+
 == sproutcore 0.9.15
 
 - Added titleize() helper for Strings.  Also imported various other helpers
@@ -113,7 +176,7 @@
 
 == sproutcore 0.9.12
 
-- SC.ButtonView & SC.MenuItemView now removes and adds the 'active' class name
+- SC.ClassicButtonView & SC.MenuItemView now removes and adds the 'active' class name
   on mouseExited and mouseEntered when the mouse is pressed to provide better 
   indication of whether an action will occur on mouse up. (Thanks schwa23)
 
@@ -159,7 +222,7 @@
 
 == sproutcore-0.9.10
 
-- SC.Platform.Firefox now returns 2 for any gecko browser that is not Firefox.
+- SC.Browser.FireFox now returns 2 for any gecko browser that is not Firefox.
 
 - set() and a variety of other methods now returns this instead of the set
 value.  This makes it possible to do method chaining.
@@ -200,7 +263,7 @@ value.  This makes it possible to do method chaining.
 - Use Element instead of element for IE compatability in 
   Element.setClassName()
     
-- Added SC.View#destroy() to remove views from internal caches. insertBefore, 
+- Added SC.ClassicView#destroy() to remove views from internal caches. insertBefore, 
   removeChild, etc. also now return the view instance so you can chain them.
 
 - Popup menu was setting the width on each of the child menu items in addition
@@ -284,7 +347,7 @@ is used by a parent class.  Changed to _optframe
 
 * Improved some documentation here and there.
 
-* [FIX] SC.View will recache its frames when isVisibleInWindow changes.  This 
+* [FIX] SC.ClassicView will recache its frames when isVisibleInWindow changes.  This 
   will help to ensure we always have the correct dimensions when bringing 
   views on and offscreen. -- All unit tests now pass again.
 
@@ -527,12 +590,12 @@ group value is null.  Items will still be shown; they will just appear to be
   generic a.button or a.regular.
 
 * Added new addClassName, removeClassName, setClassName and hasClassName
-  methods on SC.View that are 7x faster than prototype's version.
+  methods on SC.ClassicView that are 7x faster than prototype's version.
 
-* Integrated SC.Control into SC.ButtonView
+* Integrated SC.Control into SC.ClassicButtonView
 
-* Changed SC.ButtonView.labelText and SC.ButtonView.labelSelector to 
-  SC.ButtonView.title and SC.ButtonView.titleSelector to be more consistant 
+* Changed SC.ClassicButtonView.labelText and SC.ClassicButtonView.labelSelector to 
+  SC.ClassicButtonView.title and SC.ClassicButtonView.titleSelector to be more consistant 
   with current naming conventions.
 
 * [FIX] Some doc tags were wrong in SC.ScrollView and others.
@@ -549,7 +612,7 @@ own application, courtesy of IconDrawer (http://www.icondrawer.com).
 * Generalized SC.Control's observer so that you can now use it to observe
   changes to multiple properties on content.  This should capture a very 
   common pattern requires by collection item views.  Most control-list 
-  SC.Views will eventually adopt this mixin.
+  SC.ClassicViews will eventually adopt this mixin.
 
 * Added ListItemView which will be used for rendering content in list views 
   and source list views.  ListViewItem can render a name, icon, and optional
@@ -600,7 +663,7 @@ own application, courtesy of IconDrawer (http://www.icondrawer.com).
   handling selection states, enabled and focus states.
 
 * Removed support for :resize_options property in view helper, since 
-  auto-resizing is no longer supported in SC.View (it never worked right 
+  auto-resizing is no longer supported in SC.ClassicView (it never worked right 
   anyway and was not functionally very usable.)
 
 * innerText property now uses TextNodes, making it about 50% faster than 
